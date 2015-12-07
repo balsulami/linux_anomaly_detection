@@ -7,6 +7,7 @@
 #include"sparse_matrix.h"
 #include "sparse_svd.h"
 #include "one_class_svm.h"
+#include "ngrams_vector.h"
 #include "ngrams_transformer.h"
 
 
@@ -16,7 +17,7 @@ using namespace Eigen;
 
 class pipeline_estimator{
 public:
-	pipeline_estimator():_transfomer(2,350),_svd(100){
+	pipeline_estimator():_transfomer(2,350),_svd(500){
 
 	}
 

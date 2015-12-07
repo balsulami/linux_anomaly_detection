@@ -15,11 +15,6 @@
 
 #include"socket/linux_server_socket.h"
 
-std::string FTRACE_PATH = "/sys/kernel/debug/tracing";
-std::string SYSCALLS_PATH = "/sys/kernel/debug/tracing/events/raw_syscalls";
-std::string SYS_ENTRY = "sys_enter";
-std::string SYS_EXIT = "sys_exit";
-
 template<class T>
 class BaseSensor{
 public:
@@ -47,6 +42,13 @@ public:
 		delete _stream;
 	}
 
+	void start_trace(){
+		set_trace(true);
+	}
+
+	void stop_trace(){
+		set_trace(false);
+	}
 
 
 protected:

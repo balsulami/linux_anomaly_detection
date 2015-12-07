@@ -31,7 +31,6 @@ public:
             _svd.compute(sm,_components_count);
 
             this->_components = _svd.matrixV();
-            std::cout<<"\t _components shape=("<<_components.rows()<<","<<_components.cols()<<")\n";
             return _svd.matrixU() * _svd.singularValues().asDiagonal();
         }
         else

@@ -15,11 +15,11 @@ std::ostream & operator<<(std::ostream & out,const bigram & ngrams){
 }
 
 std::ostream & operator<<(std::ostream & out,const Trace & trace){
-    std::cout<<"[";
+    out<<"[";
     for(auto & syscall: trace){
         out<<syscall<<",";
     }
-    std::cout<<"]";
+    out<<"]";
     return out;
 }
 

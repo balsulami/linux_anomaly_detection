@@ -83,33 +83,7 @@ public:
 		std::vector<pid_t> pids = get_pids(cur_pid);
 
 		this->add_filter(pids);
-		this->set_trace(true);
-		if (!logging)
-			join();
-		else {
-			do {
-				try {
-					while (!_socket.listen())
-						sleep_sec(1);
-					while (!this->is_finished()) {
-						sleep_sec(1);
-						std::string status = get_status();
-						int ret = _socket.send(status);
-						if (ret == -1) {
-							_socket.close();
-							break;
-						}
-					}
-				} catch (std::exception e) {
-					// TODO add log file
-				}
-			} while (!this->is_finished());
-			_socket.send(get_summary());
-			_socket.close();
-		}
-		this->set_trace(false);
-		this->clear_filters();
-		stop();
+		this->start_trace();
 	}
 
 	void start(){
@@ -121,12 +95,22 @@ public:
 	}
 
 	void stop(){
+		this->stop_trace();
+		this->clear_filters();
 	}
 
 	void join(){
 		_reader.join();
 		_worker.join();
 	}
+
+
+
+	_out_type & result_queue(){
+		return _result_queue;
+	}
+
+private:
 
 	static void _read_stream(_in_type * _stream_queue, EventsWatch * _watch) { //T1 & inQ,T2 & outQ,DataAggregator<T3> & _data,EventsWatch & watch ){
 		std::ios_base::sync_with_stdio(false); // "/ccidata/ftrace_logs/trace_pipe-new.txt"
@@ -184,13 +168,6 @@ public:
 		}
 	}
 
-	_out_type & result_queue(){
-		return _result_queue;
-	}
-
-
-
-private:
 	ParallelWorker _reader;
 	ParallelWorker _worker;
 
@@ -202,6 +179,7 @@ private:
 	linux_server_socket _socket;
 
 	DataAggregator<T> _data;
+
 	Tracer _tracer;
 
 };
