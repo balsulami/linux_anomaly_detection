@@ -1,0 +1,45 @@
+Name
+sys_sensor - a program to collect system calls traces from Linux Kernel.
+
+Synopsis
+sys_sensor  start [-l] |
+			[-h host:port] |
+			[-o path_to_output_file] |
+			status -h host:port |
+			stop   
+
+Description
+sys_sensor is a program for collecting system calls traces from ftrace, a Linux kernel internal tracer. sys_sensor turns on the tracing and runs as a
+background process (daemon). sys_sensor writes the collected traces to a remote server, a local file, or a console. 
+
+Options
+===============================================================
+start
+	start sys_sensor for collecting system calls traces.
+-l
+	enable sys_sensor to show states on the program performance. The stats can be retrieved by using the argument 'status'.
+-o
+	writes the system calls traces to a local file.
+-h
+	writes the system calls traces to a remote server.
+================================================================
+status
+	show states on the program performance. This can't work without starting the program with '-l' option.
+-h
+	connect to the remote sensor and show its states.
+================================================================
+stop
+	stop sys_sensor and turn off the tracing.
+
+Examples
+- To start tracing a machine and write the traces to a file
+sys_sensor start -o /tmp/traces.log
+
+- To start tracing a machine and write the traces to a remote server 10.0.0.15 port 35678
+sys_sensor start -h 10.0.0.15:35678
+
+- To show stats of this sensor:
+sys_sensor status -h 10.0.0.15:35678
+
+- To stop a sensor:
+sys_sensor stop
