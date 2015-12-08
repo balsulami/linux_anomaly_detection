@@ -5,12 +5,12 @@
 #ifndef HIGHPERFORMANCELINUXSENSORS_MESSAGE_QUEUE_H
 #define HIGHPERFORMANCELINUXSENSORS_MESSAGE_QUEUE_H
 //#include "queue/moodycamel/blockingconcurrentqueue.h"
-#include "queue/simple/simple_queue.h"
+#include "queue/simple/lock_queue.h"
 
 template<typename T>
 class message_queue{
 //    typedef moodycamel::BlockingConcurrentQueue<T> _queue_type;
-    typedef SafeQueue<T> _queue_type;
+    typedef lock_queue<T> _queue_type;
 public:
     void enqueue(T message){
         _queue.enqueue(message);

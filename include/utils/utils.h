@@ -4,7 +4,7 @@
 
 #ifndef HIGHPERFORMANCELINUXSENSORS_UTILS_H
 #define HIGHPERFORMANCELINUXSENSORS_UTILS_H
-
+#include "config.h"
 #include<fstream>
 #include<string>
 #include<thread>
@@ -21,90 +21,6 @@ void write_to(const std::string & filename, const std::string & content, bool ap
     std::ofstream outfile(filename.data(), mode);
     outfile << content << "\n";
     outfile.close();
-}
-
-long find_last_linefeed(ifstream &infile) {
-
-    infile.seekg(0,std::ios::end);
-    long  filesize = infile.tellg();
-
-    for(int n=1;n<filesize;n++) {
-        infile.seekg(filesize-n-1,std::ios::beg);
-
-        char c;
-        infile.get(c);
-
-        if(c == 0x0A) return infile.tellg();
-    }
-}
-
-void sleep_sec(int sec){
-	std::this_thread::sleep_for(std::chrono::seconds(sec));
-}
-
-inline std::vector<StringRef> split3(const std::string & str, char delimiter = ' ')
-{
-    std::vector<StringRef> result;
-    result.reserve(20);
-
-    enum State { inSpace, inToken };
-
-    State state = inSpace;
-    std::string::const_iterator     pTokenBegin = str.begin();    // Init to satisfy compiler.
-    for (auto it = str.begin(); it != str.end(); ++it)
-    {
-        State newState = (*it == delimiter ? inSpace : inToken);
-        if (newState != state)
-        {
-            switch (newState)
-            {
-                case inSpace:
-                    result.emplace_back(pTokenBegin, std::abs(std::distance(it, pTokenBegin)));
-                    break;
-                case inToken:
-                    pTokenBegin = it;
-            }
-        }
-        state = newState;
-    }
-    if (state == inToken)
-    {
-        int ptr = std::abs(std::distance(pTokenBegin, str.end()));
-        result.emplace_back(pTokenBegin, ptr);
-    }
-    return result;
-}
-
-int fast_atoi(std::string::const_iterator begin, std::string::const_iterator end)
-{
-    int val = 0;
-    while (begin != end) {
-        val = val * 10 + (*begin++ - '0');
-    }
-    return val;
-}
-
-static inline std::vector<StringRef> parse_trace(std::string& str,
-	const std::string& delimiter, std::string& last_line)
-{
-	std::vector<StringRef> strings;
-	strings.reserve(200);
-
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	while ((pos = str.find(delimiter, prev)) != std::string::npos)
-	{
-		strings.emplace_back(str.begin() + prev, pos - prev);
-		prev = pos + 1;
-	}
-
-
-	if (prev < str.size() - 1){
-		std::string prevs(str.begin() + prev, str.end());
-		last_line.append(str.begin() + prev, str.end());
-		str.resize(prev);
-	}
-	return strings;
 }
 
 static inline std::vector<StringRef> split_string(std::string& str,
@@ -130,23 +46,6 @@ static inline std::vector<StringRef> split_string(std::string& str,
 	return strings;
 }
 
-static inline std::vector<StringRef> split_fast(std::string& str,const std::string& delimiter)
-{
-	std::vector<StringRef> strings;
-	strings.reserve(20);
-
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	while ((pos = str.find(delimiter, prev)) != std::string::npos)
-	{
-		strings.emplace_back(str.begin() + prev, pos - prev);
-		prev = pos + 1;
-	}
-
-	if (prev < str.size())
-		strings.emplace_back(str.begin() + prev, str.size());
-	return strings;
-}
 short str_to_short(std::string::const_iterator begin, std::string::const_iterator end){
     short _pid = 0;
     while (begin != end) {
@@ -180,8 +79,6 @@ std::vector<pid_t> get_pids(pid_t ppid){
 }
 
 #include <sys/stat.h>
-
-
 void setup_daemon(const std::string & deamon_name,const std::string & run_path) {
     //------------
     //Daemon Setup
@@ -239,17 +136,8 @@ int get_sensor_pid(const std::string & deamon_name, const std::string & run_path
 int remove_sensor_pid(const std::string & deamon_name, const std::string & run_path){
     std::remove((run_path + "/" + deamon_name + ".pid").c_str());
 }
-std::string FTRACE_PATH = "/sys/kernel/debug/tracing";
-std::string SYSCALLS_PATH = "/sys/kernel/debug/tracing/events/raw_syscalls";
-std::string SYS_ENTRY = "sys_enter";
-std::string SYS_EXIT = "sys_exit";
 
 int kill_sensor(int pid){
-    write_to(FTRACE_PATH + "/tracing_on", "0");
-    write_to(SYSCALLS_PATH + "/filter", "0");
-    write_to(SYSCALLS_PATH + "/" + SYS_ENTRY + "/" + "filter", "0");
-    write_to(SYSCALLS_PATH + "/" + SYS_EXIT + "/filter", "0");
-    sleep_sec(5);
     auto curr_pid = get_pid();
     auto pids = get_pids(pid);
     for (auto itr = pids.begin();itr < pids.end(); itr++){

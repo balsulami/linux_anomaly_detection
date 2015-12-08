@@ -10,16 +10,16 @@
 #include <condition_variable>
 
 template <class T>
-class SafeQueue
+class lock_queue
 {
 public:
-    SafeQueue(void)
+    lock_queue(void)
             : q()
             , m()
             , c()
     {}
 
-    ~SafeQueue(void)
+    ~lock_queue(void)
     {}
 
     void enqueue(T t)

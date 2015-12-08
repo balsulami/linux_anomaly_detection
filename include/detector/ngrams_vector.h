@@ -17,24 +17,6 @@ public:
         _binary = binary;
     }
 
-    SparseMatrixEx compute_tf(TraceList & traces){
-        std::vector<T> row_list;
-        for (int i = 0; i < traces.size(); i++){
-            auto & trace = traces[i];
-            auto ngram_trace = _window.transform(trace);
-            auto ngram_count = _window.count(ngram_trace);
-            for(auto iter = ngram_count.begin();iter!= ngram_count.end();iter++){
-                if(_binary)
-                    row_list.push_back(T(i,_window.index(iter->first),1));
-                else
-                    row_list.push_back(T(i,_window.index(iter->first),iter->second));
-            }
-        }
-        SparseMatrixEx csr_matrix(traces.size(),_window.features_size());
-        csr_matrix.setFromTriplets(row_list.begin(),row_list.end());
-        return csr_matrix;
-    }
-
     SparseMatrixEx compute_tfidf(TraceList & traces){
         std::vector<T> row_list;
         std::vector<std::tuple<int,bigram,double>> syscalls_freq;

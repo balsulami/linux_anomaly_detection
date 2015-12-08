@@ -16,7 +16,7 @@ int main(){
     TraceList traces = {{1,2,1,2,5,6,7,8,5,6,7,12,1,2,1,2,5},{6,7,8,5,6,7,12,1,2,1,2,5,6,7,8,5,6},{7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},{12,1,2,1,2,5,6,7,8,5,6,7,12,5,6,7,8,5,6,7,12}};
 
 //    cout<<traces[0]<<"\n";
-    AnomalyDetector<SysRecord> detector;
+    anomaly_detector<SysRecord> detector;
 //    srand(time(NULL));
 //    auto & queue = detector.result_queue();
 //

@@ -21,6 +21,6 @@ set(TEST_FILES
 
 # lib
 #add_executable(bin/syscall_sensor ${SOURCE_FILES})
-add_executable(highperformancelinuxsensors ${SOURCE_FILES} include/detector/sparse_svd.h)
+add_executable(highperformancelinuxsensors ${SOURCE_FILES})
 add_executable(testme ${TEST_FILES})
 

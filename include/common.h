@@ -3,8 +3,11 @@
 //
 
 #pragma once
+#include <Eigen/Dense>
+using Eigen::MatrixXd;
 
-
+typedef int pid_t;
+typedef short syscall_t;
 
 typedef std::tuple<short,short> bigram;
 

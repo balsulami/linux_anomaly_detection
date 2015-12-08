@@ -8,7 +8,6 @@
 #include "stream/base_stream.h"
 #include "sensor/parallel_worker.h"
 #include <algorithm>
-#include "utils/types.h"
 #include "pipeline_estimator.h"
 #include "utils/sys_record.h"
 #include <unordered_map>
@@ -17,6 +16,9 @@
 #include <chrono>
 #include "queue/message_queue.h"
 #include "sensor/multithreaded_sensor.h"
+#include <chrono>
+
+using namespace chrono;
 
 enum class EVENT_TYPE {
     Normal, Anomalous
@@ -30,13 +32,13 @@ std::ofstream output("/home/bms/projects/linux_anomaly_detector/out/logs.txt");
 
 
 template<typename T>
-class AnomalyDetector {
+class anomaly_detector {
     typedef std::unordered_map<pid_t, std::vector<syscall_t>> PIDTraces;
     typedef message_queue<std::vector<T> *> _out_type;
-    typedef void(*_callback)(AnomalyDetector * ptr) ;
+    typedef void(*_callback)(anomaly_detector * ptr) ;
 
 public:
-    AnomalyDetector(int predict_interval = 1, int train_interval = 5, int trace_len = 10)
+    anomaly_detector(int predict_interval = 1, int train_interval = 5, int trace_len = 10)
             : _predict_interval(predict_interval), _train_interval(train_interval), _trace_len(trace_len) {
 
     }
@@ -48,14 +50,14 @@ public:
         cout << "The detector is listening for " << _train_interval << " mins ... \n";
         cout.flush();
         ParallelWorker _train_worker;
-        _train_worker.start(AnomalyDetector::_extract_traces, this, nullptr);
+        _train_worker.start(anomaly_detector::_extract_traces, this, nullptr);
         std::this_thread::sleep_for(std::chrono::minutes(_train_interval));
         linux_sensor.stop_trace();
         result_queue().enqueue(nullptr);
         _train(this);
 
         linux_sensor.start_trace();
-        _worker.start(AnomalyDetector::_extract_traces, this,AnomalyDetector::_detect);
+        _worker.start(anomaly_detector::_extract_traces, this,anomaly_detector::_detect);
         cout << "The detector is running\n";
 
     }
@@ -76,7 +78,7 @@ private:
     ParallelWorker _worker;
     multithreaded_sensor<T> linux_sensor;
 
-    void static _extract_traces(AnomalyDetector *ptr,_callback callback) { //T1 & inQ,T2 & outQ,DataAggregator<T3> & _data,EventsWatch & watch ){
+    void static _extract_traces(anomaly_detector *ptr,_callback callback) { //T1 & inQ,T2 & outQ,DataAggregator<T3> & _data,EventsWatch & watch ){
         while (true) {
             if(callback != nullptr){
                 cout << "The detector is listening for " << ptr->_predict_interval << " mins ... \n";
@@ -122,7 +124,7 @@ private:
         }
     }
 
-    static void _train(AnomalyDetector *ptr) {
+    static void _train(anomaly_detector *ptr) {
         TraceList train_traces;
         std::vector<pid_t> train_pids;
         cout << "Extracting traces for training ... \n";
@@ -149,7 +151,7 @@ private:
         #endif
     }
 
-    static void _detect(AnomalyDetector *ptr) {
+    static void _detect(anomaly_detector *ptr) {
         cout << "Extracting traces for predictions ... \n";
         TraceList pred_traces;
         std::vector<pid_t> pred_pids;
