@@ -11,15 +11,17 @@ extern "C" {
 
 	struct svm_node
 	{
-		int index;
+		svm_node(long i=-1,double v=0):index(i),value(v){}
+		long index;
 		double value;
 	};
 
 	struct svm_problem
 	{
-		int l;
+		long l;
 		double *y;
 		struct svm_node **x;
+		long *x_len;
 	};
 
 	enum { C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR };	/* svm_type */

@@ -1509,7 +1509,7 @@ static void solve_one_class(
 	const svm_problem *prob, const svm_parameter *param,
 	double *alpha, Solver::SolutionInfo* si)
 {
-	int l = prob->l;
+	long l = prob->l;
 	double *zeros = new double[l];
 	schar *ones = new schar[l];
 	int i;
@@ -2110,7 +2110,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 			{
 				__model->SV[j] = prob->x[i];
 				__model->sv_coef[0][j] = f.alpha[i];
-				__model->sv_indices[j] = i + 1;
+//				__model->sv_indices[j] = i + 1; useless
 				++j;
 			}
 
@@ -2697,7 +2697,7 @@ int svm_save_model(const char *model_file_name, const svm_model *model)
 		else
 			while (p->index != -1)
 			{
-				fprintf(fp, "%d:%.8g ", p->index, p->value);
+				fprintf(fp, "%ld:%.8g ", p->index, p->value);
 				p++;
 			}
 		fprintf(fp, "\n");

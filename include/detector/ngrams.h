@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include"sparse_matrix.h"
 #include<list>
 #include<tuple>
 #include "common.h"
@@ -34,9 +33,9 @@ namespace std
 }
 
 
-class ngrams_transformer{
+class NGrams{
 public:
-    ngrams_transformer(int len = 2,int table_size = 13):_len(len),_table_size(table_size),_voca_size(std::pow(table_size,len)){
+    NGrams(int len = 2,int table_size = 13):_len(len),_table_size(table_size),_voca_size(std::pow(table_size,len)){
 
     }
 

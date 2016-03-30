@@ -1,4 +1,19 @@
 
+#define DEBUG_LOG 1
+#ifdef DEBUG_LOG
+#include<fstream>
+std::ofstream traces_out("/root/.clion11/system/cmake/generated/e3f8c42a/e3f8c42a/Release/traces.txt");
+std::ofstream debug_out("/root/.clion11/system/cmake/generated/e3f8c42a/e3f8c42a/Release/debug.txt");
+#endif
+
+#ifdef FRONT_PROCESS
+#define output_stream std::cout
+#else
+std::ofstream _output("/root/.clion11/system/cmake/generated/e3f8c42a/e3f8c42a/Release/output.txt");
+#define output_stream _output
+#endif
+
+
 #include <iostream>
 #include <fstream>
 #include"sensor/multithreaded_sensor.h"
@@ -27,7 +42,7 @@ int main(int argc, char ** argv) {
 		if (pid != -1) {
 			// pass the command stop
 			std::cout << "Stopping the daemon process pid= " << pid << "\n";
-			anomaly_detector<sys_record> detector;
+			AnomalyDetector<sys_record> detector;
 			kill_sensor(pid);
 			detector.stop();
 			remove_sensor_pid(sensor_name, run_path);
@@ -40,7 +55,7 @@ int main(int argc, char ** argv) {
 	else if ((iter = std::find(args.begin(), args.end(), "start")) != args.end()) {
 		if (pid ==-1) {
 			setup_daemon(sensor_name, run_path);
-			anomaly_detector<sys_record> detector(5,30);
+			AnomalyDetector<sys_record> detector(2,2);
 			detector.start();
 		}
 		else{

@@ -4,20 +4,19 @@
 
 #pragma once
 
-#include"sparse_matrix.h"
 #include<list>
 #include<tuple>
 #include "common.h"
-#include "ngrams_transformer.h"
+#include "ngrams.h"
 
-class ngrams_vector{
+class TfIdfTransformer{
     typedef Eigen::Triplet<double,long> T;
 public:
-    ngrams_vector(int len = 2,int table_size = 13,bool binary=false):_window(len,table_size){
+    TfIdfTransformer(int len = 2,int table_size = 13,bool binary=false):_window(len,table_size){
         _binary = binary;
     }
 
-    SparseMatrixEx compute_tfidf(TraceList & traces){
+    SparseMatrixXd compute_tfidf(TraceList & traces){
         std::vector<T> row_list;
         std::vector<std::tuple<int,bigram,double>> syscalls_freq;
         std::map<bigram,long> ngram_procs;
@@ -56,13 +55,13 @@ public:
 
             row_list.push_back(T(std::get<0>(syscall), _window.index(std::get<1>(syscall)), norm_freq));
         }
-        SparseMatrixEx csr_matrix(traces.size(),_window.features_size());
+        SparseMatrixXd csr_matrix(traces.size(),_window.features_size());
         csr_matrix.setFromTriplets(row_list.begin(),row_list.end());
         return csr_matrix;
     }
 
 private:
-    ngrams_transformer _window;
+    NGrams _window;
     bool _binary;
 };
 

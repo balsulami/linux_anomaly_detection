@@ -168,7 +168,7 @@ namespace RedSVD
             m_matrixV = Y * svdOfC.matrixV();
         }
 
-        DenseMatrix matrixU() const
+        MatrixType matrixU() const
         {
             return m_matrixU;
         }
@@ -178,15 +178,15 @@ namespace RedSVD
             return m_vectorS;
         }
 
-        DenseMatrix matrixV() const
+        MatrixType matrixV() const
         {
             return m_matrixV;
         }
 
     private:
-        DenseMatrix m_matrixU;
+        MatrixType m_matrixU;
         ScalarVector m_vectorS;
-        DenseMatrix m_matrixV;
+        MatrixType m_matrixV;
     };
 
     template<typename _MatrixType>
