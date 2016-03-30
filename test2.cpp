@@ -19,21 +19,40 @@ std::ofstream _output("/home/bms/Downloads/output.txt");
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+using Eigen::Matrix;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using Eigen::SparseMatrix;
 
-#include "detector/anomaly_detector.h"
+typedef SparseMatrix<double,Eigen::RowMajor> SMatrix;
+typedef Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> DMatrix;
+//#include "detector/anomaly_detector.h"
+
+void print_all(const DMatrix & X) {
+
+
+    auto sX = X.sparseView();
+    for (int k = 0; k < sX.outerSize(); ++k) {
+        for (SMatrix::InnerIterator it(sX, k); it; ++it) {
+            cout<<it.value()<<"\t";
+//            it.row();   // row index
+//            it.col();   // col index (here it is equal to k)
+//            it.index(); // inner index, here it is equal to it.row()
+        }
+        cout << "\n";
+    }
+}
+typedef Eigen::Triplet<double> T;
 
 int main(){
 
-    TraceList traces = {{1,2,1,2,5,6,7,8,5,6,7,12,1,2,1,2,5},
+    std::vector<std::vector<double>> traces = {{1,2,1,2,5,6,7,8,5},
                         {6,7,8,5,6,7,12,1,2,1,2,5,6,7,8,5,6},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
-                        {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
+                        {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7,6,7,12,1,2,1,2,5},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
@@ -43,43 +62,20 @@ int main(){
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {7,12,1,2,1,2,1,2,1,2,5,6,7,8,5,6,7},
                         {12,1,2,1,2,5,6,7,8,5,6,7,12,5,6,7,8,5,6,7,12}};
-    srand(time(nullptr));
-    TraceList records;
-    int random_processes = 100 +rand() % 50;
-    for (int i = 0; i < random_processes; i++) {
-        Trace trace;
-        int random_trace = 7+ rand()% 200;
-        for (int j = 0; j< random_trace ; j++) {
-            trace.emplace_back(rand()% 250);
+
+
+    std::vector<T> tripletList;
+    tripletList.reserve(traces.size()*20);
+    for(auto out_iter = traces.begin();out_iter != traces.end();out_iter++){
+        for(auto inn_iter = out_iter->begin();inn_iter != out_iter->end();inn_iter++){
+            tripletList.push_back(T(out_iter-traces.begin(),inn_iter-out_iter->begin(),*inn_iter));
         }
-        records.push_back(trace);
     }
-
-    cout<<"records size = "<<records.size()<<endl;
-
-//    Trace t = {1,2,1,2,5,6,7,8,5,6,7,1,2,1,2,5};
-//    ngrams_vector bigrams(2,500,false);
-//    auto sparse = bigrams.compute_tfidf(traces);
-//    sparse.print();
-//
-
-    TraceList records2;
-    random_processes = 100 +rand() % 50;
-    for (int i = 0; i < random_processes; i++) {
-        Trace trace;
-        int random_trace = 7+ rand()% 200;
-        for (int j = 0; j< random_trace ; j++) {
-            trace.emplace_back(1 + rand()% 40);
-        }
-        records2.push_back(trace);
-    }
-
-    Pipeline detector;
-    detector.train(records2);
-    auto preds = detector.predict(records2);
-
-    for(auto & pred : preds) {
-        std::cout << pred <<", "<<endl;
-    }
-
+    SMatrix mat(16,30);
+    mat.setFromTriplets(tripletList.begin(), tripletList.end());
+//    auto sX = mat.sparseView();
+    print_all(mat);
+    cout<<mat<<'\n';
+    cout<<mat.size()<<'\n';
+    cout<<mat.nonZeros()<<'\n';
 }
